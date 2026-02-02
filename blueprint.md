@@ -23,16 +23,32 @@ Ce projet vise à créer une application mobile Flutter qui sert d'interface à 
   - Un service `ApiService` simulera un appel réseau.
   - Il retournera des données factices (ex: `{ "studentId": "12345", "grade": "17.5" }`) pour permettre de développer et tester l'interface de manière complète.
 
+- **Navigation :**
+    - Utilisation du package `go_router` pour une navigation déclarative et robuste entre les écrans.
+
 - **Design et Style :**
   - Utilisation de `google_fonts` pour une typographie professionnelle.
   - Palette de couleurs moderne et cohérente définie dans `ThemeData`.
   - Transitions fluides entre les écrans.
 
+## Structure du Projet
+
+```
+/lib
+|-- /screens
+|   |-- scan_screen.dart     # UI pour le scan de documents
+|   |-- result_screen.dart   # UI pour afficher les résultats
+|-- /services
+|   |-- api_service.dart     # Service pour simuler l'appel à l'API
+|-- main.dart                # Point d'entrée et configuration du routing
+```
+
 ## Plan de développement actuel
 
 - **Étape 1 :** Création du `blueprint.md` et ajout des dépendances. **(Terminé)**
-- **Étape 2 :** Mettre en place la structure du projet (création des fichiers et dossiers).
+- **Étape 2 :** Mettre en place la structure du projet (création des fichiers et dossiers). **(Terminé)**
 - **Étape 3 :** Développer l'écran de scan (`scan_screen.dart`) avec la vue caméra.
 - **Étape 4 :** Développer l'écran de résultats (`result_screen.dart`).
 - **Étape 5 :** Implémenter le service de simulation (`api_service.dart`).
-- **Étape 6 :** Connecter tous les éléments ensemble.
+- **Étape 6 :** Configurer la navigation avec `go_router` dans `main.dart`.
+- **Étape 7 :** Connecter tous les éléments ensemble.
