@@ -166,6 +166,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:myapp/services/api_service.dart';
 import 'package:myapp/screens/result_screen.dart';
+import 'dart:async';
 
 class ScanScreen extends StatefulWidget {
   final List<CameraDescription> cameras;
@@ -183,6 +184,11 @@ class _ScanScreenState extends State<ScanScreen> {
   bool _isProcessing = false;
   bool _isConnected = false;
   bool _isCheckingConnection = true;
+  
+  // ✅ Nouvelles variables pour la détection en temps réel
+  Timer? _detectionTimer;
+  List<Map<String, dynamic>> _detections = [];
+  String _currentNote = "---";
 
   final ApiService _apiService = ApiService();
 
@@ -195,6 +201,11 @@ class _ScanScreenState extends State<ScanScreen> {
     );
     _initializeControllerFuture = _controller.initialize();
     _checkBackendConnection();
+    
+    // ✅ Démarre la détection automatique après initialisation
+    _initializeControllerFuture.then((_) {
+      _startContinuousDetection();
+    });
   }
 
   Future<void> _checkBackendConnection() async {
@@ -210,19 +221,49 @@ class _ScanScreenState extends State<ScanScreen> {
     }
   }
 
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
+  // ✅ Détection continue toutes les 1.5 secondes
+  void _startContinuousDetection() {
+    _detectionTimer = Timer.periodic(const Duration(milliseconds: 1500), (timer) {
+      if (!_isProcessing && _isConnected) {
+        _detectObjects();
+      }
+    });
   }
 
-  Future<void> _takePicture() async {
+  // ✅ Fonction de détection sans prendre de photo
+  Future<void> _detectObjects() async {
+    if (_isProcessing || !_controller.value.isInitialized) return;
+
+    try {
+      setState(() { _isProcessing = true; });
+      
+      final image = await _controller.takePicture();
+      final results = await _apiService.scanImage(image.path);
+
+      if (!mounted) return;
+
+      setState(() {
+        _detections = List<Map<String, dynamic>>.from(results['detections'] ?? []);
+        _currentNote = results['note'] ?? '---';
+      });
+
+    } catch (e) {
+      print('Erreur détection: $e');
+    } finally {
+      if (mounted) {
+        setState(() { _isProcessing = false; });
+      }
+    }
+  }
+
+  // ✅ Fonction pour capturer et naviguer vers les résultats
+  Future<void> _takePictureAndNavigate() async {
     if (_isProcessing) return;
 
     if (!_isConnected) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text("❌ Backend non connecté. Vérifiez votre URL ngrok."),
+          content: Text("❌ Backend non connecté"),
           backgroundColor: Colors.red,
         ),
       );
@@ -230,6 +271,9 @@ class _ScanScreenState extends State<ScanScreen> {
     }
 
     try {
+      // Arrête la détection continue
+      _detectionTimer?.cancel();
+      
       setState(() { _isProcessing = true; });
       await _initializeControllerFuture;
       final image = await _controller.takePicture();
@@ -243,22 +287,32 @@ class _ScanScreenState extends State<ScanScreen> {
         'grade': results['note'] ?? 'Non reconnue',
       };
 
-      Navigator.of(context).push(
+      await Navigator.of(context).push(
         MaterialPageRoute(
           builder: (context) => ResultScreen(scanResult: scanResult),
         ),
       );
+      
+      // Redémarre la détection après retour
+      _startContinuousDetection();
 
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Erreur lors de la capture : $e")),
+        SnackBar(content: Text("Erreur : $e")),
       );
     } finally {
       if (mounted) {
         setState(() { _isProcessing = false; });
       }
     }
+  }
+
+  @override
+  void dispose() {
+    _detectionTimer?.cancel();
+    _controller.dispose();
+    super.dispose();
   }
 
   @override
@@ -270,9 +324,56 @@ class _ScanScreenState extends State<ScanScreen> {
           if (snapshot.connectionState == ConnectionState.done) {
             return Stack(
               children: [
-                CameraPreview(_controller),
+                // Caméra
+                Positioned.fill(
+                  child: CameraPreview(_controller),
+                ),
+                
+                // ✅ Overlay avec détections
+                Positioned.fill(
+                  child: CustomPaint(
+                    painter: DetectionPainter(
+                      detections: _detections,
+                      cameraSize: Size(
+                        _controller.value.previewSize?.height ?? 1,
+                        _controller.value.previewSize?.width ?? 1,
+                      ),
+                    ),
+                  ),
+                ),
+                
+                // UI Controls
                 _buildUIOverlay(),
                 _buildConnectionIndicator(),
+                
+                // Note actuelle en haut au centre
+                if (_currentNote != "---")
+                  Positioned(
+                    top: 100,
+                    left: 0,
+                    right: 0,
+                    child: Center(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 10,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.green.withOpacity(0.9),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(
+                          _currentNote,
+                          style: GoogleFonts.poppins(
+                            color: Colors.white,
+                            fontSize: 32,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                
                 if (_isProcessing)
                   Container(
                     color: Colors.black.withOpacity(0.5),
@@ -292,7 +393,6 @@ class _ScanScreenState extends State<ScanScreen> {
     );
   }
 
-  // Nouvel indicateur de connexion
   Widget _buildConnectionIndicator() {
     return Positioned(
       top: 50,
@@ -400,7 +500,7 @@ class _ScanScreenState extends State<ScanScreen> {
         Padding(
           padding: const EdgeInsets.only(bottom: 50.0),
           child: GestureDetector(
-            onTap: _takePicture,
+            onTap: _takePictureAndNavigate,
             child: Container(
               height: 80,
               width: 80,
@@ -424,5 +524,91 @@ class _ScanScreenState extends State<ScanScreen> {
         ),
       ],
     );
+  }
+}
+
+// ✅ CustomPainter pour dessiner les boîtes de détection
+class DetectionPainter extends CustomPainter {
+  final List<Map<String, dynamic>> detections;
+  final Size cameraSize;
+
+  DetectionPainter({
+    required this.detections,
+    required this.cameraSize,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    for (var detection in detections) {
+      final box = detection['box'] as List;
+      final text = detection['text'] as String;
+      final conf = detection['conf'] as num;
+
+      // Conversion des coordonnées normalisées
+      final x1 = box[0] * size.width;
+      final y1 = box[1] * size.height;
+      final x2 = box[2] * size.width;
+      final y2 = box[3] * size.height;
+
+      // Rectangle vert
+      final paint = Paint()
+        ..color = Colors.green
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 4;
+
+      canvas.drawRect(
+        Rect.fromLTRB(x1, y1, x2, y2),
+        paint,
+      );
+
+      // Label "Note" en haut
+      final textPainter = TextPainter(
+        text: TextSpan(
+          text: 'Note',
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        textDirection: TextDirection.ltr,
+      );
+      textPainter.layout();
+
+      // Background du label
+      final labelBg = Paint()..color = Colors.green;
+      canvas.drawRect(
+        Rect.fromLTWH(x1, y1 - 30, textPainter.width + 20, 30),
+        labelBg,
+      );
+      textPainter.paint(canvas, Offset(x1 + 10, y1 - 25));
+
+      // Valeur détectée en bas
+      if (text.isNotEmpty && text != "---") {
+        final valuePainter = TextPainter(
+          text: TextSpan(
+            text: '$text (${conf.toStringAsFixed(1)}%)',
+            style: TextStyle(
+              color: Colors.black,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          textDirection: TextDirection.ltr,
+        );
+        valuePainter.layout();
+
+        canvas.drawRect(
+          Rect.fromLTWH(x1, y2 + 5, valuePainter.width + 20, 35),
+          labelBg,
+        );
+        valuePainter.paint(canvas, Offset(x1 + 10, y2 + 13));
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(DetectionPainter oldDelegate) {
+    return detections != oldDelegate.detections;
   }
 }

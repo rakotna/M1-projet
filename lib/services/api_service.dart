@@ -1,38 +1,19 @@
-// import 'dart:math';
-
-// // Classe pour simuler les appels à votre backend d'IA.
-// class ApiService {
-//   // Simule l'envoi d'une image et la réception des données reconnues.
-//   Future<Map<String, String>> scanImage(String imagePath) async {
-//     // Simule une latence réseau de 1 à 3 secondes.
-//     await Future.delayed(Duration(seconds: 1 + Random().nextInt(2)));
-
-//     // Simule une réponse réussie du backend.
-//     // Dans une vraie application, vous feriez un appel HTTP ici.
-//     return {
-//       'studentId': '${10000 + Random().nextInt(89999)}', // Génère un ID étudiant aléatoire
-//       'grade': '${12 + Random().nextDouble() * (8)}'.substring(0, 4), // Génère une note entre 12.0 et 20.0
-//     };
-//   }
-// }
-
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class ApiService {
-  // ⚠️ Remplace par ton URL ngrok après avoir lancé le backend
+  // ✅ Ton URL ngrok
   static const String baseUrl = "https://thi-creasy-lightsomely.ngrok-free.dev";
 
-    // Nouvelle méthode pour tester la connexion
   Future<bool> checkConnection() async {
     try {
       final response = await http.get(
         Uri.parse('$baseUrl/detect'),
-      ).timeout(const Duration(seconds: 3));
+      ).timeout(const Duration(seconds: 5));
       
       return response.statusCode == 405 || response.statusCode == 200;
-      // 405 = Method Not Allowed (normal pour GET sur route POST)
     } catch (e) {
+      print('Erreur de connexion: $e');
       return false;
     }
   }
@@ -44,12 +25,22 @@ class ApiService {
         Uri.parse('$baseUrl/detect'),
       );
 
+      // ✅ Ajoute le header ngrok
+      request.headers['ngrok-skip-browser-warning'] = 'true';
+
       request.files.add(
         await http.MultipartFile.fromPath('frame', imagePath),
       );
 
-      var response = await request.send();
+      print('📤 Envoi de l\'image au backend...');
+      
+      var response = await request.send().timeout(
+        const Duration(seconds: 30),
+      );
+      
       var responseData = await response.stream.bytesToString();
+      
+      print('📥 Réponse reçue (${response.statusCode}): $responseData');
       
       if (response.statusCode == 200) {
         return json.decode(responseData);
@@ -57,6 +48,7 @@ class ApiService {
         throw Exception('Erreur serveur: ${response.statusCode}');
       }
     } catch (e) {
+      print('❌ Erreur complète: $e');
       throw Exception('Erreur de connexion: $e');
     }
   }
