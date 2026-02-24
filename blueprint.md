@@ -1,54 +1,31 @@
 
-# Blueprint: Système de Transcription de Notes Intelligent
+# Blueprint: ScolarAI
 
-## Vue d'ensemble
+## Overview
 
-Ce projet vise à créer une application mobile Flutter qui sert d'interface à un backend d'Intelligence Artificielle. L'application permet aux utilisateurs de scanner des feuilles de notes manuscrites à l'aide de l'appareil photo de leur téléphone. L'image capturée est envoyée à un service backend qui utilise un réseau de neurones (OCR) pour reconnaître le numéro de l'étudiant et sa note. Les données extraites sont ensuite affichées à l'utilisateur pour confirmation.
+ScolarAI is a Flutter application designed to perform Optical Character Recognition (OCR) on Malagasy school report cards. The goal is to digitize and process the information from these documents efficiently.
 
-## Fonctionnalités (Version 1.0)
+## Features & Design
 
-- **Interface de Scan Moderne :**
-  - Affichage en plein écran du flux vidéo de la caméra.
-  - Superposition graphique pour guider le cadrage du document.
-  - Bouton de capture flottant et esthétique.
-  - Contrôle pour activer/désactiver le flash.
+### Core Functionality
+- **OCR:** Utilizes TFLite for on-device machine learning to recognize text from images and `http`/`dio` to potentially connect to a remote TrOCR API for more complex recognition tasks.
+- **Camera Integration:** Uses the `camera` package to capture images of the report cards directly within the app.
+- **Image Picking:** Allows users to select existing images from their device's gallery using `image_picker`.
+- **PDF Export:** Generates and exports the extracted data into PDF documents using the `pdf` and `printing` packages.
+- **Firebase Integration:** Uses `cloud_firestore` to store and sync data.
 
-- **Écran de Confirmation des Résultats :**
-  - Après la capture, une nouvelle page affiche les données extraites (simulées pour l'instant) :
-    - **Numéro Étudiant :** [Numéro reconnu]
-    - **Note :** [Note reconnue]
-  - Boutons pour "Confirmer" ou "Reprendre le scan".
+### UI/UX
+- **Animations:** The UI will be enhanced with animations from `flutter_animate`, `lottie`, and `animated_text_kit` to create a more engaging user experience.
+- **Styling:** `glassmorphism` will be used for modern UI effects. `shimmer` will provide loading indicators.
+- **Custom Fonts:** The application uses the "Poppins" font family.
+- **SVG Support:** `flutter_svg` is included for using scalable vector graphics.
 
-- **Simulation du Backend :**
-  - Un service `ApiService` simulera un appel réseau.
-  - Il retournera des données factices (ex: `{ "studentId": "12345", "grade": "17.5" }`) pour permettre de développer et tester l'interface de manière complète.
+### Utilities
+- **Permissions:** `permission_handler` manages necessary device permissions (e.g., camera, storage).
+- **Local Storage:** `shared_preferences` is used for simple key-value data persistence.
+- **Date/Time Formatting:** `intl` is used for internationalization and date formatting.
+- **Unique IDs:** `uuid` is used to generate unique identifiers for documents or entries.
 
-- **Navigation :**
-    - Utilisation du package `go_router` pour une navigation déclarative et robuste entre les écrans.
+## Current Plan
 
-- **Design et Style :**
-  - Utilisation de `google_fonts` pour une typographie professionnelle.
-  - Palette de couleurs moderne et cohérente définie dans `ThemeData`.
-  - Transitions fluides entre les écrans.
-
-## Structure du Projet
-
-```
-/lib
-|-- /screens
-|   |-- scan_screen.dart     # UI pour le scan de documents
-|   |-- result_screen.dart   # UI pour afficher les résultats
-|-- /services
-|   |-- api_service.dart     # Service pour simuler l'appel à l'API
-|-- main.dart                # Point d'entrée et configuration du routing
-```
-
-## Plan de développement actuel
-
-- **Étape 1 :** Création du `blueprint.md` et ajout des dépendances. **(Terminé)**
-- **Étape 2 :** Mettre en place la structure du projet (création des fichiers et dossiers). **(Terminé)**
-- **Étape 3 :** Développer l'écran de scan (`scan_screen.dart`) avec la vue caméra.
-- **Étape 4 :** Développer l'écran de résultats (`result_screen.dart`).
-- **Étape 5 :** Implémenter le service de simulation (`api_service.dart`).
-- **Étape 6 :** Configurer la navigation avec `go_router` dans `main.dart`.
-- **Étape 7 :** Connecter tous les éléments ensemble.
+The initial setup is complete. The project dependencies have been defined in `pubspec.yaml` and successfully installed. The next step is to start building the application's user interface and implementing the core features.

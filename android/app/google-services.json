@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "606863112932",
+    "project_id": "scolar-ai-project",
+    "storage_bucket": "scolar-ai-project.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:606863112932:android:ca7d4b882a8fdaedb84af1",
+        "android_client_info": {
+          "package_name": "com.example.myapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBnqnWE_6YtT0w3wWTSO97kEV4yzziPX08"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
