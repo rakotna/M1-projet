@@ -46,8 +46,10 @@
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
     <key>NSCameraUsageDescription</key>
-    <string>Cette application a besoin d\'accéder à la caméra pour scanner les feuilles de notes.</string>
+    <string>ScolarAI utilise la caméra pour photographier un bulletin.</string>
     <key>NSMicrophoneUsageDescription</key>
     <string>Cette application n\'a pas besoin du microphone, mais il est inclus dans les permissions de la caméra.</string>
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>ScolarAI a besoin d'accéder à vos photos pour importer un bulletin.</string>
 </dict>
 </plist>

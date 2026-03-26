@@ -10,7 +10,12 @@ plugins {
 
 android {
     namespace = "com.example.myapp"
+
+    // ✅ FIX: monté à 36 pour satisfaire camera, image_picker, path_provider, androidx.core
     compileSdk = 36
+
+    // ✅ FIX: build-tools aligné sur compileSdk
+    buildToolsVersion = "36.0.0"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -22,22 +27,26 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId = "com.example.myapp"
-        // You can update the following values to match your application needs.
-        // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion
+
+        // ✅ FIX: targetSdk aligné sur compileSdk
         targetSdk = 36
+
         versionCode = 1
         versionName = "1.0"
+
+        // Conservé : MultiDex pour les nombreuses dépendances
+        multiDexEnabled = true
     }
 
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig = signingConfigs.getByName("debug")
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
     }
 }

@@ -2,10 +2,12 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import '../main.dart';
 import 'scan_screen.dart';
 import 'history_screen.dart';
+import 'exploration_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -50,6 +52,8 @@ class _HomeScreenState extends State<HomeScreen>
         headers: {'ngrok-skip-browser-warning': 'true'},
       ).timeout(const Duration(seconds: 10));
 
+      if (!mounted) return;
+
       if (response.statusCode == 200) {
         setState(() {
           _connectionStatus = '✅ Connecté — ScolarAI API active';
@@ -70,6 +74,7 @@ class _HomeScreenState extends State<HomeScreen>
         });
       }
     } catch (e) {
+      if (!mounted) return;
       setState(() {
         _connectionStatus = '❌ Hors ligne — Vérifiez Colab';
         _connectionColor  = AppColors.error;
@@ -83,7 +88,9 @@ class _HomeScreenState extends State<HomeScreen>
             borderRadius: BorderRadius.circular(12)),
       ));
     } finally {
-      setState(() => _isTesting = false);
+      if (mounted) {
+        setState(() => _isTesting = false);
+      }
     }
   }
 
@@ -121,6 +128,8 @@ class _HomeScreenState extends State<HomeScreen>
                   _buildStatsGrid(),
                   const SizedBox(height: 16),
                   _buildHistoryButton(context),
+                  const SizedBox(height: 10),
+                  _buildExplorationButton(context),
                   const SizedBox(height: 32),
                   _buildFooter(),
                   const SizedBox(height: 24),
@@ -145,7 +154,7 @@ class _HomeScreenState extends State<HomeScreen>
           end: Alignment.bottomRight,
         ),
         boxShadow: [
-          BoxShadow(color: AppColors.primary.withOpacity(0.5), blurRadius: 30),
+          BoxShadow(color: AppColors.primary.withAlpha(128), blurRadius: 30),
         ],
       ),
       child: const Icon(Icons.document_scanner, color: Colors.white, size: 40),
@@ -177,7 +186,7 @@ class _HomeScreenState extends State<HomeScreen>
     return Text(
       'OCR Bulletins Scolaires • Madagascar 2026',
       style: TextStyle(fontFamily: 'Poppins', fontSize: 12,
-          color: Colors.white.withOpacity(0.5), letterSpacing: 1),
+          color: Colors.white.withAlpha(128), letterSpacing: 1),
       textAlign: TextAlign.center,
     ).animate().fadeIn(delay: 800.ms, duration: 600.ms);
   }
@@ -186,7 +195,7 @@ class _HomeScreenState extends State<HomeScreen>
   Widget _buildApiStatusCard() {
     return GlassCard(
       padding: const EdgeInsets.all(16),
-      borderColor: _connectionColor.withOpacity(0.4),
+      borderColor: _connectionColor.withAlpha(102),
       child: Column(children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -198,7 +207,7 @@ class _HomeScreenState extends State<HomeScreen>
                   shape: BoxShape.circle,
                   color: _connectionColor,
                   boxShadow: [
-                    BoxShadow(color: _connectionColor.withOpacity(0.5),
+                    BoxShadow(color: _connectionColor.withAlpha(128),
                         blurRadius: 6),
                   ],
                 ),
@@ -224,7 +233,7 @@ class _HomeScreenState extends State<HomeScreen>
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.secondary.withOpacity(0.3),
+                      color: AppColors.secondary.withAlpha(77),
                       blurRadius: 10,
                     ),
                   ],
@@ -249,7 +258,6 @@ class _HomeScreenState extends State<HomeScreen>
         const Divider(color: Colors.white10),
         const SizedBox(height: 8),
 
-        // URL API
         const Row(children: [
           Icon(Icons.link, color: Colors.white24, size: 12),
           SizedBox(width: 6),
@@ -273,18 +281,18 @@ class _HomeScreenState extends State<HomeScreen>
           MaterialPageRoute(builder: (_) => const ScanScreen())),
       child: GlassCard(
         padding: const EdgeInsets.all(24),
-        borderColor: AppColors.primary.withOpacity(0.5),
+        borderColor: AppColors.primary.withAlpha(128),
         child: Column(children: [
           Container(
             width: 72, height: 72,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               gradient: LinearGradient(colors: [
-                AppColors.primary.withOpacity(0.3),
-                AppColors.secondary.withOpacity(0.3),
+                AppColors.primary.withAlpha(77),
+                AppColors.secondary.withAlpha(77),
               ]),
               border: Border.all(
-                  color: AppColors.primary.withOpacity(0.5), width: 2),
+                  color: AppColors.primary.withAlpha(128), width: 2),
             ),
             child: const Icon(Icons.camera_alt,
                 color: AppColors.primary, size: 32),
@@ -302,7 +310,7 @@ class _HomeScreenState extends State<HomeScreen>
             'Vidéo temps réel → YOLO détecte\nMémoire max → TrOCR reconnaît',
             textAlign: TextAlign.center,
             style: TextStyle(fontFamily: 'Poppins', fontSize: 12,
-                color: Colors.white.withOpacity(0.55), height: 1.5),
+                color: Colors.white.withAlpha(140), height: 1.5),
           ),
 
           const SizedBox(height: 16),
@@ -310,13 +318,13 @@ class _HomeScreenState extends State<HomeScreen>
             spacing: 6, runSpacing: 6,
             alignment: WrapAlignment.center,
             children: AppConfig.fields.map((field) {
-              final color = AppColors.fieldColors[field] ?? AppColors.primary;
+              final color = AppConfig.fieldColors[field] ?? AppColors.primary;
               return Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20),
-                  color: color.withOpacity(0.12),
-                  border: Border.all(color: color.withOpacity(0.5)),
+                  color: color.withAlpha(30),
+                  border: Border.all(color: color.withAlpha(128)),
                 ),
                 child: Text(AppConfig.fieldLabels[field] ?? field,
                     style: TextStyle(fontFamily: 'Poppins', fontSize: 11,
@@ -362,13 +370,13 @@ class _HomeScreenState extends State<HomeScreen>
         final color = stat['color'] as Color;
         return GlassCard(
           padding: const EdgeInsets.all(12),
-          borderColor: color.withOpacity(0.3),
+          borderColor: color.withAlpha(77),
           child: Row(children: [
             Container(
               padding: const EdgeInsets.all(7),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: color.withOpacity(0.15),
+                color: color.withAlpha(38),
               ),
               child: Icon(stat['icon'] as IconData, color: color, size: 18),
             ),
@@ -404,7 +412,7 @@ class _HomeScreenState extends State<HomeScreen>
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(shape: BoxShape.circle,
-                  color: AppColors.secondary.withOpacity(0.15)),
+                  color: AppColors.secondary.withAlpha(38)),
               child: const Icon(Icons.history,
                   color: AppColors.secondary, size: 20),
             ),
@@ -422,12 +430,78 @@ class _HomeScreenState extends State<HomeScreen>
     ).animate().fadeIn(delay: 900.ms).slideY(begin: 0.1, delay: 900.ms);
   }
 
+  Widget _buildExplorationButton(BuildContext context) {
+    return GestureDetector(
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const ExplorationScreen()),
+      ),
+      child: GlassCard(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+        borderColor: const Color(0xFF1D6F42).withAlpha(128),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: const Color(0xFF1D6F42).withAlpha(46),
+                ),
+                child: const Icon(Icons.add_photo_alternate_rounded,
+                    color: Color(0xFF2E8B57), size: 20),
+              ),
+              const SizedBox(width: 12),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Exploration',
+                      style: GoogleFonts.poppins(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white)),
+                  Text('Importer image • Export Excel',
+                      style: GoogleFonts.poppins(
+                          fontSize: 11,
+                          color: Colors.white54)),
+                ],
+              ),
+            ]),
+            // Badge Excel
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                color: const Color(0xFF1D6F42).withAlpha(51),
+                border: Border.all(
+                    color: const Color(0xFF2E8B57).withAlpha(128)),
+              ),
+              child: Row(mainAxisSize: MainAxisSize.min, children: [
+                const Icon(Icons.table_chart_rounded,
+                    color: Color(0xFF2E8B57), size: 12),
+                const SizedBox(width: 4),
+                Text('XLSX',
+                    style: GoogleFonts.poppins(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w700,
+                        color: const Color(0xFF2E8B57))),
+              ]),
+            ),
+            const Icon(Icons.arrow_forward_ios,
+                color: Colors.white38, size: 14),
+          ],
+        ),
+      ),
+    ).animate().fadeIn(delay: 950.ms).slideY(begin: 0.1);
+  }
+
   Widget _buildFooter() {
     return Text(
       'YOLO OBB + TrOCR V3 • Mémoire temporelle\nMade with ❤️ in Madagascar 2026',
       textAlign: TextAlign.center,
       style: TextStyle(fontFamily: 'Poppins', fontSize: 10,
-          color: Colors.white.withOpacity(0.25), height: 1.6),
+          color: Colors.white.withAlpha(64), height: 1.6),
     ).animate().fadeIn(delay: 1200.ms);
   }
 }
@@ -479,7 +553,7 @@ class _Orb extends StatelessWidget {
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         gradient: RadialGradient(
-          colors: [color.withOpacity(0.25), Colors.transparent],
+          colors: [color.withAlpha(64), Colors.transparent],
         ),
       ),
     );

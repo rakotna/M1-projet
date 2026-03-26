@@ -93,7 +93,7 @@ class _ScanScreenState extends State<ScanScreen>
   Timer? _frameTimer;
 
   List<DetectedBox>        _liveBoxes  = [];
-  Map<String, DetectedBox> _bestMemory = {};
+  final Map<String, DetectedBox> _bestMemory = {};
 
   final List<String> _logs  = [];
   int _framesSent    = 0;
@@ -353,7 +353,7 @@ class _ScanScreenState extends State<ScanScreen>
         ])),
 
         if (_isSending)
-          Container(color: Colors.black.withOpacity(0.7),
+          Container(color: Colors.black.withAlpha(178),
             child: Center(child: GlassCard(
               padding: const EdgeInsets.all(28),
               child: Column(mainAxisSize: MainAxisSize.min, children: [
@@ -378,8 +378,8 @@ class _ScanScreenState extends State<ScanScreen>
     child: Row(children: [
       GestureDetector(
         onTap: () { _stopScan(); Navigator.pop(context); },
-        child: GlassCard(padding: const EdgeInsets.all(10), borderRadius: 12,
-            child: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 18)),
+        child: const GlassCard(padding: EdgeInsets.all(10), borderRadius: 12,
+            child: Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 18)),
       ),
       const SizedBox(width: 10),
       Expanded(child: GlassCard(
@@ -394,7 +394,7 @@ class _ScanScreenState extends State<ScanScreen>
       GlassCard(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         borderRadius: 12,
-        borderColor: AppColors.accent.withOpacity(0.5),
+        borderColor: AppColors.accent.withAlpha(128),
         child: Text('${_bestMemory.length}/6',
             style: const TextStyle(fontFamily: 'Poppins',
                 fontSize: 14, fontWeight: FontWeight.w700,
@@ -440,11 +440,11 @@ class _ScanScreenState extends State<ScanScreen>
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
-          color: live ? color.withOpacity(0.4)
-              : best != null ? color.withOpacity(0.2) : Colors.black54,
+          color: live ? color.withAlpha(102)
+              : best != null ? color.withAlpha(51) : Colors.black54,
           border: Border.all(
             color: live ? color
-                : best != null ? color.withOpacity(0.5) : Colors.white24,
+                : best != null ? color.withAlpha(128) : Colors.white24,
             width: live ? 2 : 1,
           ),
         ),
@@ -452,7 +452,7 @@ class _ScanScreenState extends State<ScanScreen>
           Icon(live ? Icons.visibility
               : best != null ? Icons.check_circle : Icons.circle_outlined,
               color: live ? color
-                  : best != null ? color.withOpacity(0.8) : Colors.white38,
+                  : best != null ? color.withAlpha(204) : Colors.white38,
               size: 12),
           const SizedBox(width: 4),
           Text(AppConfig.fieldLabels[field] ?? field,
@@ -463,7 +463,7 @@ class _ScanScreenState extends State<ScanScreen>
             const SizedBox(width: 3),
             Text('${(best.confidence*100).toStringAsFixed(0)}%',
                 style: TextStyle(fontFamily: 'Poppins', fontSize: 9,
-                    color: color.withOpacity(0.8))),
+                    color: color.withAlpha(204))),
             if (best.angle.abs() > 2) ...[
               const SizedBox(width: 2),
               Text('${best.angle.toStringAsFixed(0)}°',
@@ -532,7 +532,7 @@ class _ObbBoxPainter extends CustomPainter {
 
         // Ombre
         canvas.drawPath(path,
-          Paint()..color = color.withOpacity(0.15)
+          Paint()..color = color.withAlpha(38)
                  ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 5));
 
         // Contour OBB
@@ -596,8 +596,8 @@ class _CornersPainter extends CustomPainter {
       ..strokeWidth = 3..style = PaintingStyle.stroke..strokeCap = StrokeCap.round;
     const m = 32.0; const l = 28.0;
     final w = size.width; final h = size.height;
-    canvas.drawLine(Offset(m,m+l), Offset(m,m), p);
-    canvas.drawLine(Offset(m,m), Offset(m+l,m), p);
+    canvas.drawLine(const Offset(m,m+l), const Offset(m,m), p);
+    canvas.drawLine(const Offset(m,m), const Offset(m+l,m), p);
     canvas.drawLine(Offset(w-m-l,m), Offset(w-m,m), p);
     canvas.drawLine(Offset(w-m,m), Offset(w-m,m+l), p);
     canvas.drawLine(Offset(m,h-m-l), Offset(m,h-m), p);

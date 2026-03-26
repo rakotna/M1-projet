@@ -1,5 +1,6 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'dart:developer' as developer;
 
 class ApiService {
   // ✅ Ton URL ngrok
@@ -13,7 +14,7 @@ class ApiService {
       
       return response.statusCode == 405 || response.statusCode == 200;
     } catch (e) {
-      print('Erreur de connexion: $e');
+      developer.log('Erreur de connexion: $e', name: 'ApiService');
       return false;
     }
   }
@@ -32,7 +33,7 @@ class ApiService {
         await http.MultipartFile.fromPath('frame', imagePath),
       );
 
-      print('📤 Envoi de l\'image au backend...');
+      developer.log('📤 Envoi de l\'image au backend...', name: 'ApiService');
       
       var response = await request.send().timeout(
         const Duration(seconds: 30),
@@ -40,7 +41,7 @@ class ApiService {
       
       var responseData = await response.stream.bytesToString();
       
-      print('📥 Réponse reçue (${response.statusCode}): $responseData');
+      developer.log('📥 Réponse reçue (${response.statusCode}): $responseData', name: 'ApiService');
       
       if (response.statusCode == 200) {
         return json.decode(responseData);
@@ -48,7 +49,7 @@ class ApiService {
         throw Exception('Erreur serveur: ${response.statusCode}');
       }
     } catch (e) {
-      print('❌ Erreur complète: $e');
+      developer.log('❌ Erreur complète: $e', name: 'ApiService');
       throw Exception('Erreur de connexion: $e');
     }
   }
