@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import '../models/scan_result.dart'; // Nous créerons ce modèle juste après
