@@ -15,6 +15,7 @@ ScolarAI is a Flutter application designed to perform Optical Character Recognit
 - **Firebase Integration:** Uses `cloud_firestore` to store and sync data.
 
 ### UI/UX
+- **Onboarding Experience:** A multi-step onboarding process guides users through the app's features. The UI is enhanced with animations, a subtle noise texture, and a modern design.
 - **Animations:** The UI will be enhanced with animations from `flutter_animate`, `lottie`, and `animated_text_kit` to create a more engaging user experience.
 - **Styling:** `glassmorphism` will be used for modern UI effects. `shimmer` will provide loading indicators.
 - **Custom Fonts:** The application uses the "Poppins" font family.
@@ -28,4 +29,4 @@ ScolarAI is a Flutter application designed to perform Optical Character Recognit
 
 ## Current Plan
 
-The initial setup is complete. The project dependencies have been defined in `pubspec.yaml` and successfully installed. The next step is to start building the application's user interface and implementing the core features.
+The initial setup is complete, and the onboarding screen has been enhanced with a more visually appealing and user-friendly design. The next steps are to build the remaining screens and implement the core OCR functionality.
