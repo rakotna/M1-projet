@@ -4,7 +4,7 @@ Application Flutter permettant la **numérisation (OCR)** et l’**extraction st
 
 Le projet combine :
 - capture d’images (caméra / galerie),
-- détection de zones d’intérêt (modèle **YOLO** via TFLite),
+- détection de zones d’intérêt (modèle **YOLO** via TFLite, mis a jour **docTr**),
 - reconnaissance de texte (pipeline OCR),
 - stockage et exploitation des données (Firebase / local),
 - export (PDF / Excel) et partage.
